@@ -8,8 +8,10 @@ let contractAddr = '0x87a61ee8b47876e6ef437c4c403687d2a4f28804'
 let WIF = 'KxDgvEKzgSBPPfuVfw67oPQBSjidEiqTHURKSDL1R7yGaGYAeYnr'
 let account = Neon.create.account(WIF);
 let privateKey = Neo.wallet.getPrivateKeyFromWIF(WIF)
-let networkUrl = 'http://localhost:30333'
-let neoscanUrl = 'http://localhost:4000/api/main_net'
+const address = require('./properties').address
+let networkUrl = `http://${address}:30333`  //'http://localhost:30333'
+// console.log(networkUrl)
+let neoscanUrl = `http://${address}:4000/api/main_net` //'http://localhost:4000/api/main_net'
 let addr_1 = "e9eed8dc39332032dc22e5d6e86332c50327ba23"
 const scriptHash = '1825a77f40149e0272b217c480b676136a2f456f' // Scripthash for the contract
 
@@ -44,24 +46,24 @@ const get_BalanceOf = {scriptHash, operation: 'balanceOf', args: [Neon.u.reverse
 const get_getTime = {scriptHash, operation: 'getTime', args: []}
 
 // writeRequest to choose what method to write to NEO blockchain
-const writeRequest = {
-  net: neoscanUrl,
-  url: networkUrl,
-  script: minusToken,  // Change this method script to WRITE
-  address: account.address,
-  privateKey: account.privateKey,
-  publicKey: account.publicKey,
-  gas: 0,
-  balance: null
-};
+// const writeRequest = {
+//   net: neoscanUrl,
+//   url: networkUrl,
+//   script: minusToken,  // Change this method script to WRITE
+//   address: account.address,
+//   privateKey: account.privateKey,
+//   publicKey: account.publicKey,
+//   gas: 0,
+//   balance: null
+// };
 
 // Sign and writing to NEO blockchain
-Neo.api.neoscan.getBalance(neoscanUrl, account.address).then(data => {
-  writeRequest.balance = data;
-  Neon.doInvoke(writeRequest).then(res => console.log(res.response));
-}).catch(err => {
-  console.log(err)
-});
+// Neo.api.neoscan.getBalance(neoscanUrl, account.address).then(data => {
+//   writeRequest.balance = data;
+//   Neon.doInvoke(writeRequest).then(res => console.log(res.response));
+// }).catch(err => {
+//   console.log(err)
+// });
 
 
 // Query the NEO blockchain
