@@ -9,8 +9,8 @@ let WIF = 'KxDgvEKzgSBPPfuVfw67oPQBSjidEiqTHURKSDL1R7yGaGYAeYnr'
 let account = Neon.create.account(WIF);
 let privateKey = Neo.wallet.getPrivateKeyFromWIF(WIF)
 const localAddress = require('./properties').address
-let networkUrl = `http://${localAddress}:30333`  //'http://localhost:30333'
-let neoscanUrl = `http://${localAddress}:4000/api/main_net` //'http://localhost:4000/api/main_net'
+let networkUrl = `http://localhost:30333`  //'http://localhost:30333'
+let neoscanUrl = `http://localhost:4000/api/main_net` //'http://localhost:4000/api/main_net'
 let addr_1 = "e9eed8dc39332032dc22e5d6e86332c50327ba23"
 const scriptHash = '1825a77f40149e0272b217c480b676136a2f456f' // Scripthash for the contract
 
@@ -40,7 +40,7 @@ const writeRequest = {
   net: neoscanUrl,
   url: networkUrl,
   script: null,  
-  address: null,
+  address: account.address,
   privateKey: account.privateKey,
   publicKey: account.publicKey,
   gas: 0,
@@ -50,9 +50,8 @@ const writeRequest = {
 let setToken = function(address, amount) {
   setToken = Neon.create.script({ scriptHash: scriptHash, operation: "setToken", args: [Neon.u.reverseHex(Neo.wallet.getScriptHashFromAddress(address)), amount]})
 
-  Neo.api.neoscan.getBalance(neoscanUrl, account.address).then(data => {
+  Neo.api.neoscan.getBalance(neoscanUrl, address).then(data => {
     let setTokenRequest = writeRequest
-    setTokenRequest.address = address
     setTokenRequest.script = setToken
     setTokenRequest.balance = data
     Neon.doInvoke(setTokenRequest).then(res => console.log(res.response));
@@ -66,7 +65,6 @@ let bonusToken = function(address, amount) {
 
   Neo.api.neoscan.getBalance(neoscanUrl, account.address).then(data => {
     let bonusTokenRequest = writeRequest
-    bonusTokenRequest.address = address
     bonusTokenRequest.script = bonusToken
     bonusTokenRequest.balance = data
     Neon.doInvoke(bonusTokenRequest).then(res => console.log(res.response));
@@ -80,7 +78,6 @@ let minusToken = function(address, amount) {
 
   Neo.api.neoscan.getBalance(neoscanUrl, account.address).then(data => {
     let minusTokenRequest = writeRequest
-    minusTokenRequest.address = address
     minusTokenRequest.script = minusToken
     minusTokenRequest.balance = data
     Neon.doInvoke(minusTokenRequest).then(res => console.log(res.response));
@@ -96,7 +93,7 @@ let balanceOf = function(address) {
   rpc.Query.invokeScript(balanceOfScript)
   .execute(networkUrl)                 
   .then(res => {
-    console.log("Balance of:", addr_1, ":",res.result.stack[0].value) 
+    console.log("Balance of:", addr_1, ":",parseInt(Neon.u.reverseHex(res.result.stack[0].value), 16)) 
 }).catch(error => {
   console.log(error)
 })
@@ -115,7 +112,7 @@ let getTime = function() {
 })
 }
 
-// setToken(account.address, 500)
+// setToken(account.address, 1000)
 // bonusToken(account.address, 100)
 // minusToken(account.address, 50)
 // balanceOf(account.address)
@@ -129,3 +126,20 @@ module.exports = {
   getTime,
   account
 }
+
+// console.log(parseInt(Neon.u.reverseHex("f401"), 16))   // ByteArray to Int
+// console.log(Neon.u.hexstring2str("53434c20746f6b656e")) // ByteArray to String
+
+// let numberOfWallets = 10; //replace 100 with the number of wallets you want to create
+// let accounts = []; 
+
+// for (let i = 0; i < numberOfWallets; i++) {
+//     let PrivateKey = Neo.wallet.generatePrivateKey(); 
+//     let WIF = Neo.wallet.getWIFFromPrivateKey(PrivateKey);
+//     let account = Neon.create.account(WIF)
+//     // let acc = Neo.wallet.getScriptHashFromAddress(account)
+//     accounts.push(account); 
+// }; 
+
+// console.log(accounts)
+// // console.log(Neo.wallet.getScriptHashFromAddress(accounts[0]))
